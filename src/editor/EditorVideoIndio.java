@@ -234,6 +234,7 @@ public class EditorVideoIndio implements ActionListener {
 			}
 			manejarRecientes(path);
 			contadorPalabras = areaTexto.getText().split("\\s+").length;
+			cuentaLineas.setText("Lineas: " + contadorLineas);
 			cuentaPalabras.setText("Palabras:" + contadorPalabras);
 			bfReader.close();
 		} catch (IOException e) {
@@ -281,21 +282,26 @@ public class EditorVideoIndio implements ActionListener {
 			String texto = areaTexto.getText();
 			if(event.getKeyChar() == KeyEvent.VK_SPACE) {
 				cuentaPalabras.setText("Palabras: " + ++contadorPalabras);
+			// Aunque se haga autowrap, no se considera una línea aparte, 
+			// al igual que por ejemplo el editor Kate de KDE.
 			} else if(event.getKeyChar() == KeyEvent.VK_ENTER){
 				cuentaLineas.setText("Lineas: " + ++contadorLineas);
+			// Se actualiza al borrar. Hay que dejar un espacio tras la palabra
+			// para que todas las palabras sean contadas, sobre todo después de 
+			// pulsar Enter y escribir una sola palabra en la línea.
 			} else if(event.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
-				// Se actualiza. Al contar los espacios hay que dejar uno en blanco
-				// para que todas las palabras sean contadas.
 				contadorPalabras = (texto.split("\\s+").length);
 				contadorLineas = (texto.split("\\n+").length);
-				// Si se ha borrado todo el contenido:
+				// Si se ha borrado todo el contenido, para que no quede esa
+				// molesta "Palabra: 1" cuando realmente no hay nada.
 				if(texto.equals("")) {
 					contadorPalabras = 0;
-					contadorLineas = 1;
 				}
 				cuentaPalabras.setText("Palabras: " + contadorPalabras);
+				cuentaLineas.setText("Lineas: " + contadorLineas);
 			}
-			System.out.println(event.getKeyChar());
+			// Pruebas
+			// System.out.println(event.getKeyChar());
 		}
 	}
 }
