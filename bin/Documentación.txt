@@ -1,0 +1,7 @@
+DOCUMENTACIÓN
+Lucía León Milán - 1º DAM
+
+La documentación, en lugar de recopilarla en un PDF, se ha ido añadiendo en los
+muchos comentarios del propio código.
+
+El funcionamiento del editor se explica en la ayuda del menú.
