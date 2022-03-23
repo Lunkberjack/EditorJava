@@ -29,7 +29,8 @@ import javax.swing.JToolBar;
 import javax.swing.text.DefaultEditorKit;
 
 public class EditorVideoIndio implements ActionListener {
-	public int contadorRecientes, contadorPalabras = 1;
+	// No tiene por qué haber palabras, pero al menos hay una línea.
+	public int contadorRecientes, contadorPalabras = 0, contadorLineas = 1;
 	JFrame marco;
 	JMenuBar barraMenu;
 	JMenu archivo, herramientas;
@@ -41,7 +42,7 @@ public class EditorVideoIndio implements ActionListener {
 	JPopupMenu menuPopup;
 	JButton botonNuevo, botonAbrir, botonRecientes, botonGuardar;
 	JPanel barraEstado;
-	JLabel cuentaPalabras;
+	JLabel cuentaPalabras, cuentaLineas;
 
 	public EditorVideoIndio() {
 		marco = new JFrame();
@@ -123,9 +124,12 @@ public class EditorVideoIndio implements ActionListener {
 		// Barra de estado
 		barraEstado = new JPanel();
 		cuentaPalabras = new JLabel();
-		cuentaPalabras.setText("Contador de palabras: ");
+		cuentaPalabras.setText("Palabras: ");
+		cuentaLineas = new JLabel();
+		cuentaLineas.setText("Lineas: " + contadorLineas);
 		barraEstado.add(cuentaPalabras, BorderLayout.EAST);
-		marco.add(barraEstado, BorderLayout.SOUTH);
+		barraEstado.add(cuentaLineas, BorderLayout.SOUTH);
+		marco.add(barraEstado, BorderLayout.PAGE_END);
 
 
 		// Se añaden varios componentes al marco
@@ -224,12 +228,14 @@ public class EditorVideoIndio implements ActionListener {
 			marco.setTitle(path);
 			while((linea = bfReader.readLine()) != null) {
 				area.setText(area.getText() + linea + "\n");
+				contadorLineas++;
 			}
 			manejarRecientes(path);
-			contadorPalabras = 0;
+			contadorPalabras = areaTexto.getText().split("\\s+").length;
+			cuentaPalabras.setText("Palabras:" + contadorPalabras);
 			bfReader.close();
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(areaTexto,"No se encontró el archivo :(");
+			JOptionPane.showMessageDialog(areaTexto,"No se encontró el archivo. ¿Lo has borrado o cambiado de directorio? :(");
 			System.out.println("ERROR de entrada/salida. No se encontró el archivo.");
 		}
 	}
@@ -266,17 +272,28 @@ public class EditorVideoIndio implements ActionListener {
 			System.out.println("ERROR de entrada/salida.");
 		}
 	}
-	
+
 	class Teclas extends KeyAdapter {
-	    @Override
-	    public void keyPressed(KeyEvent event) {
-	    	String texto = areaTexto.getText();
-	    	if(event.getKeyChar() == KeyEvent.VK_SPACE) {
-	    		cuentaPalabras.setText("Palabras: " + contadorPalabras++);
-	    	} if(event.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-	    		contadorPalabras = (texto.split("\\s+").length);
-	    	}
-	        System.out.println(event.getKeyChar());
-	    }
+		@Override
+		public void keyPressed(KeyEvent event) {
+			String texto = areaTexto.getText();
+			if(event.getKeyChar() == KeyEvent.VK_SPACE) {
+				cuentaPalabras.setText("Palabras: " + ++contadorPalabras);
+			} else if(event.getKeyChar() == KeyEvent.VK_ENTER){
+				cuentaLineas.setText("Lineas: " + ++contadorLineas);
+			} else if(event.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+				// Se actualiza. Al contar los espacios hay que dejar uno en blanco
+				// para que todas las palabras sean contadas.
+				contadorPalabras = (texto.split("\\s+").length);
+				contadorLineas = (texto.split("\\n+").length);
+				// Si se ha borrado todo el contenido:
+				if(texto.equals("")) {
+					contadorPalabras = 0;
+					contadorLineas = 1;
+				}
+				cuentaPalabras.setText("Palabras: " + contadorPalabras);
+			}
+			System.out.println(event.getKeyChar());
+		}
 	}
 }
