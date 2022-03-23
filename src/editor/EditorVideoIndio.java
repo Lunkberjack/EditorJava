@@ -2,9 +2,11 @@ package editor;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -27,7 +29,7 @@ import javax.swing.JToolBar;
 import javax.swing.text.DefaultEditorKit;
 
 public class EditorVideoIndio implements ActionListener {
-	public int contadorRecientes, contadorPalabras;
+	public int contadorRecientes, contadorPalabras = 1;
 	JFrame marco;
 	JMenuBar barraMenu;
 	JMenu archivo, herramientas;
@@ -40,13 +42,13 @@ public class EditorVideoIndio implements ActionListener {
 	JButton botonNuevo, botonAbrir, botonRecientes, botonGuardar;
 	JPanel barraEstado;
 	JLabel cuentaPalabras;
-    
+
 	public EditorVideoIndio() {
 		marco = new JFrame();
 		// Si se cierra la ventana de la GUI, el programa termina.
 		marco.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		marco.setBounds(500, 200, 500, 500);
-		
+
 		// Menú (barra)
 		barraMenu = new JMenuBar();
 		archivo = new JMenu("Archivo");
@@ -82,7 +84,7 @@ public class EditorVideoIndio implements ActionListener {
 		herramientas.add(cortar);
 		herramientas.add(copiar);
 		herramientas.add(pegar);
-		
+
 		// Barra de herramientas
 		botonNuevo = new JButton();
 		botonNuevo.setIcon(new ImageIcon("src/icons/add.png"));
@@ -96,7 +98,7 @@ public class EditorVideoIndio implements ActionListener {
 		botonGuardar = new JButton();
 		botonGuardar.setIcon(new ImageIcon("src/icons/save.png"));
 		botonGuardar.addActionListener(this);
-		
+
 		barraHerramientas = new JToolBar(null, JToolBar.VERTICAL);
 		barraHerramientas.add(botonNuevo);
 		barraHerramientas.add(botonAbrir);
@@ -117,17 +119,18 @@ public class EditorVideoIndio implements ActionListener {
 		menuPopup.add(copiar);
 		menuPopup.add(pegar);
 		areaTexto.setComponentPopupMenu(menuPopup);
-		
+
 		// Barra de estado
 		barraEstado = new JPanel();
 		cuentaPalabras = new JLabel();
 		cuentaPalabras.setText("Contador de palabras: ");
 		barraEstado.add(cuentaPalabras, BorderLayout.EAST);
 		marco.add(barraEstado, BorderLayout.SOUTH);
-		
-		
+
+
 		// Se añaden varios componentes al marco
 		areaTexto.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		areaTexto.addKeyListener(new Teclas());
 		marco.add(barraHerramientas, BorderLayout.WEST);
 		marco.add(areaTexto, BorderLayout.CENTER);
 		barraMenu.add(archivo);
@@ -149,9 +152,10 @@ public class EditorVideoIndio implements ActionListener {
 		if(evento.getSource() == archivoNuevo || evento.getSource() == botonNuevo) {
 			areaTexto.setText("");
 			marco.setTitle("Nuevo archivo");
-		/**
-		 * Abre el archivo de texto y lo muestra en el JTextPane.
-		 */
+			contadorPalabras = 0;
+			/**
+			 * Abre el archivo de texto y lo muestra en el JTextPane.
+			 */
 		} else if (evento.getSource() == archivoAbrir || evento.getSource() == botonAbrir) {
 			JFileChooser fileChooser = new JFileChooser();
 			int seleccion = fileChooser.showOpenDialog(areaTexto);
@@ -161,20 +165,20 @@ public class EditorVideoIndio implements ActionListener {
 			} else {
 				JOptionPane.showMessageDialog(areaTexto, "No has seleccionado archivo :(");
 			}
-		/**
-		 * Permite abrir hasta dos archivos recientemente abiertos.
-		 */
+			/**
+			 * Permite abrir hasta dos archivos recientemente abiertos.
+			 */
 		} else if(evento.getSource() == reciente1 || evento.getSource() == reciente2) {
 			String path;
 			if(evento.getSource() == reciente1) {
-				 path = reciente1.getText();
+				path = reciente1.getText();
 			} else {
 				path = reciente2.getText();
 			}
 			abrirArchivo(path, areaTexto);
-		/**
-		* Guarda el contenido en un archivo cuyo nombre hay que pasar como parámetro
-		*/
+			/**
+			 * Guarda el contenido en un archivo cuyo nombre hay que pasar como parámetro
+			 */
 		} else if (evento.getSource() == archivoGuardar || evento.getSource() == botonGuardar) {
 			JOptionPane.showMessageDialog(areaTexto,"No escribas nombre de archivo, tu archivo se llamará untitled.txt por defecto :)");
 			JFileChooser chooser = new JFileChooser(); 
@@ -190,11 +194,11 @@ public class EditorVideoIndio implements ActionListener {
 			else {
 				JOptionPane.showMessageDialog(areaTexto, "No has seleccionado carpeta :(");
 			}
-		/**
-		 * El botón de la barra de herramientas tiene una funcionalidad distinta:
-		 * en vez de presentar dos submenús, abre el archivo más reciente abierto.
-		 * Si no se encuentra el archivo, notifica al usuario.
-		 */
+			/**
+			 * El botón de la barra de herramientas tiene una funcionalidad distinta:
+			 * en vez de presentar dos submenús, abre el archivo más reciente abierto.
+			 * Si no se encuentra el archivo, notifica al usuario.
+			 */
 		} else if (evento.getSource() == botonRecientes) {
 			if(!reciente2.getText().equalsIgnoreCase("reciente 2")) {
 				abrirArchivo(reciente2.getText(), areaTexto);
@@ -222,6 +226,7 @@ public class EditorVideoIndio implements ActionListener {
 				area.setText(area.getText() + linea + "\n");
 			}
 			manejarRecientes(path);
+			contadorPalabras = 0;
 			bfReader.close();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(areaTexto,"No se encontró el archivo :(");
@@ -262,7 +267,16 @@ public class EditorVideoIndio implements ActionListener {
 		}
 	}
 	
-	public void contarPalabras() {
-		
+	class Teclas extends KeyAdapter {
+	    @Override
+	    public void keyPressed(KeyEvent event) {
+	    	String texto = areaTexto.getText();
+	    	if(event.getKeyChar() == KeyEvent.VK_SPACE) {
+	    		cuentaPalabras.setText("Palabras: " + contadorPalabras++);
+	    	} if(event.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+	    		contadorPalabras = (texto.split("\\s+").length);
+	    	}
+	        System.out.println(event.getKeyChar());
+	    }
 	}
 }
