@@ -1,12 +1,12 @@
 package editor;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.text.DefaultEditorKit;
@@ -35,10 +36,11 @@ public class EditorVideoIndio implements ActionListener {
 	JMenuBar barraMenu;
 	JMenu archivo, herramientas;
 	JMenuItem archivoNuevo, archivoAbrir, archivoAbrirReciente, archivoGuardar,
-	cortar, copiar, pegar;
+			  cortar, copiar, pegar;
 	JMenuItem reciente1, reciente2;
 	JToolBar barraHerramientas;
 	JTextPane areaTexto;
+	JScrollPane scroll; 
 	JPopupMenu menuPopup;
 	JButton botonNuevo, botonAbrir, botonRecientes, botonGuardar;
 	JPanel barraEstado;
@@ -49,12 +51,20 @@ public class EditorVideoIndio implements ActionListener {
 		// Si se cierra la ventana de la GUI, el programa termina.
 		marco.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		marco.setBounds(500, 200, 500, 500);
-
+		
+		// JTextPane
+		areaTexto = new JTextPane();
+		areaTexto.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		areaTexto.addKeyListener(new Teclas());
+		
+		// JScrollPane
+		scroll = new JScrollPane(areaTexto);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		
 		// Menú (barra)
 		barraMenu = new JMenuBar();
 		archivo = new JMenu("Archivo");
 		herramientas = new JMenu("Herramientas");
-		areaTexto = new JTextPane();
 
 		// Componentes del menú
 		archivoNuevo = new JMenuItem("Nuevo archivo");
@@ -133,10 +143,9 @@ public class EditorVideoIndio implements ActionListener {
 
 
 		// Se añaden varios componentes al marco
-		areaTexto.setFont(new Font("Tahoma", Font.PLAIN, 24));
-		areaTexto.addKeyListener(new Teclas());
+
 		marco.add(barraHerramientas, BorderLayout.WEST);
-		marco.add(areaTexto, BorderLayout.CENTER);
+		marco.getContentPane().add(scroll, BorderLayout.CENTER);
 		barraMenu.add(archivo);
 		barraMenu.add(herramientas);
 		marco.setJMenuBar(barraMenu);
@@ -225,9 +234,11 @@ public class EditorVideoIndio implements ActionListener {
 		try {
 			String linea;
 			BufferedReader bfReader = new BufferedReader(new FileReader(path));
-			// Borra todo el contenido del archivo anterior.
+			// Borra todo el contenido del archivo anterior y pone las líneas a 0.
 			area.setText("");
+			contadorLineas = 0;
 			marco.setTitle(path);
+			
 			while((linea = bfReader.readLine()) != null) {
 				area.setText(area.getText() + linea + "\n");
 				contadorLineas++;
