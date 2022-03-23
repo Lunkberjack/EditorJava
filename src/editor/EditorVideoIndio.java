@@ -167,6 +167,8 @@ public class EditorVideoIndio implements ActionListener {
 			if (seleccion == JFileChooser.APPROVE_OPTION) { 
 				abrirArchivo(fileChooser.getSelectedFile().getAbsolutePath(), areaTexto);
 			} else {
+				// Si no se especifica un contenedor padre del recuadro de mensaje, este saldrá fuera
+				// del contenedor y confundirá a los usuarios.
 				JOptionPane.showMessageDialog(areaTexto, "No has seleccionado archivo :(");
 			}
 			/**
@@ -268,7 +270,7 @@ public class EditorVideoIndio implements ActionListener {
 			bfWriter.write(area.getText());
 			bfWriter.close();
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null,"Algo ha salido mal guardando tu archivo :(");
+			JOptionPane.showMessageDialog(areaTexto,"Algo ha salido mal guardando tu archivo :(");
 			System.out.println("ERROR de entrada/salida.");
 		}
 	}
