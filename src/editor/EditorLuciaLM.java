@@ -53,7 +53,7 @@ public class EditorLuciaLM implements ActionListener {
 	private JPanel barraEstado;
 	private JTextField nombreArchivo;
 	private JLabel etiquetaArchivo, cuentaPalabras, cuentaLineas;
-	Dimension size = new Dimension(750, 500);
+	private Dimension size = new Dimension(750, 500);
 
 	public EditorLuciaLM() {
 		marco = new JFrame();
@@ -300,9 +300,9 @@ public class EditorLuciaLM implements ActionListener {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					System.out.println((String)(fuentes.combo.getSelectedItem()));
+					areaTexto.setFont(new Font((String)fuentes.combo.getSelectedItem(), areaTexto.getFont().getStyle(), areaTexto.getFont().getSize()));
 				}
 			});
-			System.out.println(fuentes.getFuenteSeleccionada());
 		}
 	}
 	/**
