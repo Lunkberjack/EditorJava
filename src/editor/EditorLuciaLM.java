@@ -294,10 +294,8 @@ public class EditorLuciaLM implements ActionListener {
 		 * una fuente para usar.
 		 */
 		} else if(evento.getSource() == cambiarFuente) {
-			String tipog = "";
 			GenerarFuentes fuentes = new GenerarFuentes();
-			tipog = fuentes.getFuenteSeleccionada();
-			System.out.println(tipog);
+			System.out.println(fuentes.getFuenteSeleccionada());
 		}
 	}
 	/**

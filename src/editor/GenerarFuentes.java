@@ -21,7 +21,7 @@ public class GenerarFuentes extends JDialog {
 	private JComboBox<String> combo;
 	private String fuenteSeleccionada;
 	Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-	Dimension dimension = new Dimension(250, 100);
+	Dimension dimension = new Dimension(400, 100);
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -40,6 +40,7 @@ public class GenerarFuentes extends JDialog {
 		marco2 = new JFrame();
 		marco2.setSize(dimension);
 		marco2.setLocationRelativeTo(null);
+		marco2.setTitle("Escoja una fuente...");
 		// Solo se cierra esta clase, no todo el programa.
 		marco2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
