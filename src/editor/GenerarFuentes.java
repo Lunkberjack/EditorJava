@@ -18,7 +18,7 @@ public class GenerarFuentes extends JDialog {
 	private JFrame marco2;
 	private JPanel panel;
 	private JLabel texto;
-	private JComboBox<String> combo;
+	public JComboBox<String> combo;
 	private String fuenteSeleccionada;
 	Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
 	Dimension dimension = new Dimension(400, 100);
@@ -49,12 +49,14 @@ public class GenerarFuentes extends JDialog {
 		
 		panel = new JPanel();
 		combo = new JComboBox<String>();
-		combo.addActionListener(new ActionListener() {
+	/*	combo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fuenteSeleccionada = (String)combo.getSelectedItem();
 			}
 		});
+		
+		*/
 		String fuentes[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 		for(int i=0; i < fuentes.length; i++) {
 			combo.addItem(fuentes[i]);

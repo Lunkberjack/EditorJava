@@ -295,6 +295,13 @@ public class EditorLuciaLM implements ActionListener {
 		 */
 		} else if(evento.getSource() == cambiarFuente) {
 			GenerarFuentes fuentes = new GenerarFuentes();
+			fuentes.combo.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.out.println((String)(fuentes.combo.getSelectedItem()));
+				}
+			});
 			System.out.println(fuentes.getFuenteSeleccionada());
 		}
 	}
