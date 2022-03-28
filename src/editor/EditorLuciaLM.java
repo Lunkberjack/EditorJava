@@ -1,7 +1,9 @@
 package editor;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -33,37 +35,37 @@ import javax.swing.text.DefaultEditorKit;
  * Abrir Reciente, Guardar y crear un Archivo Nuevo. También se puede 
  * Cortar, Copiar y Pegar desde un menú edición. Incorpora una ayuda.
  * @author LucíaLM
- * @versionm 1.0
+ * @version 2.0
  */
 public class EditorLuciaLM implements ActionListener {
 	// No tiene por qué haber palabras, pero al menos hay una línea.
-	public int contadorRecientes, contadorPalabras = 0, contadorLineas = 1;
-	JFrame marco;
-	JMenuBar barraMenu;
-	JMenu archivo, edicion, ayuda;
-	JMenuItem archivoNuevo, archivoAbrir, archivoAbrirReciente, archivoGuardar,
-			  cortar, copiar, pegar, sobre;
-	JMenuItem reciente1, reciente2;
-	JToolBar barraHerramientas;
-	JTextPane areaTexto;
-	JScrollPane scroll; 
-	JPopupMenu menuPopup;
-	JButton botonNuevo, botonAbrir, botonRecientes, botonGuardar;
-	JPanel barraEstado;
-	JTextField nombreArchivo;
-	JLabel etiquetaArchivo, cuentaPalabras, cuentaLineas;
+	private int contadorRecientes, contadorPalabras = 0, contadorLineas = 1;
+	private JFrame marco;
+	protected JMenuBar barraMenu;
+	protected JMenu archivo, edicion, caracter, ayuda;
+	protected JMenuItem archivoNuevo, archivoAbrir, archivoAbrirReciente, archivoGuardar, cortar, copiar, pegar,
+			  sobre, fuente, cambiarFuente, tamanio, t1, t2, t3, t4, estilo, negrita, cursiva, reciente1, reciente2;
+	private JToolBar barraHerramientas;
+	private JTextPane areaTexto;
+	private JScrollPane scroll; 
+	private JPopupMenu menuPopup;
+	private JButton botonNuevo, botonAbrir, botonRecientes, botonGuardar;
+	private JPanel barraEstado;
+	private JTextField nombreArchivo;
+	private JLabel etiquetaArchivo, cuentaPalabras, cuentaLineas;
+	Dimension size = new Dimension(750, 500);
 
 	public EditorLuciaLM() {
 		marco = new JFrame();
 		// Si se cierra la ventana de la GUI, el programa termina.
 		marco.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		marco.setBounds(500, 200, 750, 500);
+		marco.setSize(size);
+		marco.setLocationRelativeTo(null); // Así se abre en el centro de la pantalla.
 		
 		// JTextPane y JScrollPane
 		areaTexto = new JTextPane();
 		areaTexto.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		areaTexto.addKeyListener(new Teclas());
-		
 		scroll = new JScrollPane(areaTexto);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		
@@ -73,6 +75,7 @@ public class EditorLuciaLM implements ActionListener {
 		nombreArchivo = new JTextField("Guardar con este nombre (cámbialo)", 10);
 		
 		archivo = new JMenu("Archivo");
+		caracter = new JMenu("Carácter");
 		edicion = new JMenu("Edición");
 		ayuda = new JMenu("Ayuda");
 
@@ -89,6 +92,27 @@ public class EditorLuciaLM implements ActionListener {
 		reciente2.addActionListener(this);
 		archivoGuardar = new JMenuItem("Guardar archivo");
 		archivoGuardar.addActionListener(this);
+		
+		fuente = new JMenu("Fuente");
+		cambiarFuente = new JMenuItem("Cambiar...");
+		cambiarFuente.addActionListener(this);
+		
+		tamanio = new JMenu("Tamaño");
+		generarTamanio();
+		/*t1 = new JMenuItem("16");
+		t1.addActionListener(this);
+		t2 = new JMenuItem("20");
+		t2.addActionListener(this);
+		t3 = new JMenuItem("24");
+		t3.addActionListener(this);
+		t4 = new JMenuItem("28");
+		t4.addActionListener(this);*/
+		estilo = new JMenu("Estilo");
+		cursiva = new JMenuItem("Cursiva");
+		cursiva.addActionListener(this);
+		negrita = new JMenuItem("Negrita");
+		negrita.addActionListener(this);
+
 		cortar = new JMenuItem("Cortar");
 		copiar = new JMenuItem("Copiar");
 		pegar = new JMenuItem("Pegar");
@@ -104,6 +128,18 @@ public class EditorLuciaLM implements ActionListener {
 		archivoAbrirReciente.add(reciente1);
 		archivoAbrirReciente.add(reciente2);
 		archivo.add(archivoGuardar);
+		
+		caracter.add(fuente);
+		fuente.add(cambiarFuente);
+		caracter.add(tamanio);
+		/*tamanio.add(t1);
+		tamanio.add(t2);
+		tamanio.add(t3);
+		tamanio.add(t4);*/
+		caracter.add(estilo);
+		estilo.add(negrita);
+		estilo.add(cursiva);
+		
 		edicion.add(cortar);
 		edicion.add(copiar);
 		edicion.add(pegar);
@@ -159,6 +195,7 @@ public class EditorLuciaLM implements ActionListener {
 		marco.add(barraHerramientas, BorderLayout.WEST);
 		marco.getContentPane().add(scroll, BorderLayout.CENTER);
 		barraMenu.add(archivo);
+		barraMenu.add(caracter);
 		barraMenu.add(edicion);
 		barraMenu.add(ayuda);
 		barraMenu.add(etiquetaArchivo);
@@ -252,6 +289,15 @@ public class EditorLuciaLM implements ActionListener {
 					+ "no se actualiza, solo pulsa Espacio+Backspace y lo tendrás a tu disposición.\nRecuerda poner un espacio "
 					+ "tras cambiar de línea si solo vas a escribir una palabra por línea.\n\nPuedes editar desde "
 					+ "el menú Edición o haciendo click derecho sobre el área de texto.\n\n¡Disfruta!");
+		/**
+		 * Instancia una clase que se abre en un nuevo marco y permite seleccionar
+		 * una fuente para usar.
+		 */
+		} else if(evento.getSource() == cambiarFuente) {
+			String tipog = "";
+			GenerarFuentes fuentes = new GenerarFuentes();
+			tipog = fuentes.getFuenteSeleccionada();
+			System.out.println(tipog);
 		}
 	}
 	/**
@@ -352,6 +398,15 @@ public class EditorLuciaLM implements ActionListener {
 				cuentaPalabras.setText("Palabras: " + contadorPalabras);
 				cuentaLineas.setText("Lineas: " + contadorLineas);
 			}
+		}
+	}
+	/**
+	 * Crea los JMenuItem para el tamaño de letra.
+	 */
+	public void generarTamanio() {
+		for(int i=12; i < 50; i+=4) {
+			JMenuItem elemento = new JMenuItem("" + i);
+			tamanio.add(elemento);
 		}
 	}
 }
