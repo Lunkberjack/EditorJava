@@ -9,7 +9,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,9 +31,13 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.text.DefaultEditorKit;
 /**
- * Clase que crea un editor simple de texto con las funciones de Abrir,
- * Abrir Reciente, Guardar y crear un Archivo Nuevo. También se puede 
- * Cortar, Copiar y Pegar desde un menú edición. Incorpora una ayuda.
+ * Clase que crea un editor simple de texto con las funciones de Abrir, Abrir Reciente, Guardar 
+ * y crear un Archivo Nuevo. También se puede Cortar, Copiar y Pegar desde un menú edición, 
+ * así como haciendo click derecho (Menú PopUp). Incorpora una ayuda.
+ * 
+ * En la versión 2.0 se añaden las funciones de cambio de tipo, tamaño y estilo de fuente. Además
+ * se pueden comparar dos archivos por líneas, palabras y bytes.
+ * 
  * @author LucíaLM
  * @version 2.0
  */
@@ -51,7 +54,7 @@ public class EditorLuciaLM implements ActionListener {
 	private JScrollPane scroll; 
 	private JPopupMenu menuPopup;
 	private JButton botonNuevo, botonAbrir, botonRecientes, botonGuardar, botonComparar, botonFuente, botonCursiva,
-					botonNegrita;
+	botonNegrita;
 	private JPanel barraEstado;
 	private JTextField nombreArchivo;
 	private JLabel etiquetaArchivo, cuentaPalabras, cuentaLineas;
@@ -212,7 +215,6 @@ public class EditorLuciaLM implements ActionListener {
 		barraEstado.add(cuentaLineas, BorderLayout.SOUTH);
 		marco.add(barraEstado, BorderLayout.PAGE_END);
 
-
 		// Se añaden varios componentes al marco
 		marco.add(barraHerramientas, BorderLayout.WEST);
 		marco.getContentPane().add(scroll, BorderLayout.CENTER);
@@ -244,7 +246,7 @@ public class EditorLuciaLM implements ActionListener {
 			marco.setTitle("Nuevo archivo");
 			nombreArchivo.setText("Pon un nombre");
 			contadorPalabras = 0;
-			/**
+			/** ABRIR
 			 * Abre el archivo de texto y lo muestra en el JTextPane.
 			 */
 		} else if (evento.getSource() == archivoAbrir || evento.getSource() == botonAbrir) {
@@ -259,7 +261,7 @@ public class EditorLuciaLM implements ActionListener {
 				// del contenedor y confundirá a los usuarios.
 				JOptionPane.showMessageDialog(marco, "No has seleccionado archivo :(");
 			}
-			/**
+			/** ABRIR RECIENTES
 			 * Permite abrir hasta dos archivos recientemente abiertos.
 			 */
 		} else if(evento.getSource() == reciente1 || evento.getSource() == reciente2) {
@@ -270,7 +272,7 @@ public class EditorLuciaLM implements ActionListener {
 				path = reciente2.getText();
 			}
 			abrirArchivo(path, areaTexto);
-			/**
+			/** GUARDAR
 			 * Guarda el contenido en un archivo cuyo nombre hay que pasar como parámetro
 			 */
 		} else if (evento.getSource() == archivoGuardar || evento.getSource() == botonGuardar) {
@@ -292,7 +294,7 @@ public class EditorLuciaLM implements ActionListener {
 			} else {
 				JOptionPane.showMessageDialog(marco, "Cámbialo, está arriba a la derecha :)");
 			}
-			/**
+			/** RECIENTES - BARRA HERRAMIENTAS
 			 * El botón de la barra de herramientas tiene una funcionalidad distinta:
 			 * en vez de presentar dos submenús, abre el archivo más reciente abierto.
 			 * Si no se encuentra el archivo, notifica al usuario.
@@ -305,7 +307,7 @@ public class EditorLuciaLM implements ActionListener {
 			} else {
 				JOptionPane.showMessageDialog(marco, "No tienes archivos recientes que abrir :(");
 			}
-			/**
+			/** AYUDA - SOBRE
 			 * Mensaje de información y ayuda.
 			 */
 		} else if (evento.getSource() == sobre) {
@@ -316,7 +318,8 @@ public class EditorLuciaLM implements ActionListener {
 					+ "no se actualiza, solo pulsa Espacio+Backspace y lo tendrás a tu disposición.\nRecuerda poner un espacio "
 					+ "tras cambiar de línea si solo vas a escribir una palabra por línea.\n\nPuedes editar desde "
 					+ "el menú Edición o haciendo click derecho sobre el área de texto.\n\n¡Disfruta!");
-			/**
+			
+			/** TIPO FUENTE
 			 * Instancia una clase que se abre en un nuevo marco y permite seleccionar
 			 * una fuente para usar.
 			 */
@@ -325,17 +328,19 @@ public class EditorLuciaLM implements ActionListener {
 			fuentes.combo.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println((String)(fuentes.combo.getSelectedItem()));
 					areaTexto.setFont(new Font((String)fuentes.combo.getSelectedItem(), areaTexto.getFont().getStyle(), areaTexto.getFont().getSize()));
 				}
 			});
-			/**
-			 * Cambio de tamaño.
+			
+			/** TAMAÑO FUENTE
+			 * Cambio de tamaño. Solo se puede realizar a través del menú, ya que los valores son fijos
+			 * y desde la barra de herramientas no se pueden seleccionar todos los disponibles.
 			 */
 		} else if(evento.getSource().equals(t1) || evento.getSource().equals(t2) || evento.getSource().equals(t3) || evento.getSource().equals(t4)) {
 			// Eclipse añade solo el abstract button y no funciona sin el casting.
 			areaTexto.setFont(new Font(areaTexto.getFont().getName(), areaTexto.getFont().getStyle(), Integer.valueOf(((AbstractButton)evento.getSource()).getText().toString())));
-			/**
+			
+			/** ESTILO FUENTE
 			 * Lógica para controlar negrita, cursiva, negrita+cursiva y texto plano.
 			 */
 		} else if(evento.getSource().equals(negrita) || evento.getSource().equals(botonNegrita)) {
@@ -374,13 +379,14 @@ public class EditorLuciaLM implements ActionListener {
 				areaTexto.setFont(new Font(areaTexto.getFont().getName(), Font.ITALIC, areaTexto.getFont().getSize()));
 				italic = true;
 			}
-			/**
+			/** COMPARAR ARCHIVOS
 			 * Compara archivos desde la barra de herramientas y el menú.
 			 */
 		} else if(evento.getSource().equals(archivoComparar) || evento.getSource().equals(botonComparar)) {
 			JFileChooser fileChooser = new JFileChooser();
 			String path = null, path2 = null;
-			int seleccion = fileChooser.showOpenDialog(areaTexto);
+			// Dos selectores de archivo.
+			int seleccion = fileChooser.showOpenDialog(marco);
 			if (seleccion == JFileChooser.APPROVE_OPTION) { 
 				path = fileChooser.getSelectedFile().getAbsolutePath();
 			}
@@ -389,6 +395,7 @@ public class EditorLuciaLM implements ActionListener {
 			if(seleccion2 == JFileChooser.APPROVE_OPTION) {
 				path2 = fileChooser.getSelectedFile().getAbsolutePath();
 			}
+			// Los dos path deben existir.
 			if(path != null && path2 != null) {
 				compararArchivos(path, path2);
 			} else {
@@ -427,10 +434,11 @@ public class EditorLuciaLM implements ActionListener {
 	}	
 	/**
 	 * Se encarga de organizar los paths recientes que aparecen en los submenús
-	 * de Abrir reciente.
+	 * de Abrir reciente. Como solo se utiliza en otros métodos de este clase
+	 * puede ser private.
 	 * @param path
 	 */
-	public void manejarRecientes(String path) {
+	private void manejarRecientes(String path) {
 		if(contadorRecientes == 0) {
 			reciente1.setText(path);
 		} else if(contadorRecientes == 1) {
@@ -481,7 +489,7 @@ public class EditorLuciaLM implements ActionListener {
 			palabrasArchivo1 = textoArchivo1.split("\\s+").length;
 			// Cada carácter ocupa un byte (suponiendo que no incluimos caracteres raros)
 			bytesArchivo1 = textoArchivo1.length();
-			
+
 			bfReader2 = new BufferedReader(new FileReader(path2));
 			while((linea = bfReader2.readLine()) != null) {
 				textoArchivo2 += linea;
@@ -489,7 +497,7 @@ public class EditorLuciaLM implements ActionListener {
 			}
 			palabrasArchivo2 = textoArchivo2.split("\\s+").length;
 			bytesArchivo2 = textoArchivo2.length();
-			
+
 			// Resultado: se muestra como mensaje
 			JOptionPane.showMessageDialog(marco, "El archivo 1 tiene " + lineasArchivo1 + " líneas, " + palabrasArchivo1 + 
 					" palabras y " + bytesArchivo1 + " bytes.\nEl archivo 2 tiene " + lineasArchivo2 + " líneas, " +
